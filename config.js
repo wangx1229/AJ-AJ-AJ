@@ -6,15 +6,15 @@ module.exports = {
         host: 'smtp.qq.com',
         secureConnection: true,
         auth: {
-            user: 'xx@qq.com',
-            pass: 'xx'
+            user: '1570680400@qq.com',
+            pass: 'sejlrpjgzxyqggjf'
         }
     },
     // 发件人
-    EmailFrom: 'xx@qq.com',
+    EmailFrom: '1570680400@qq.com',
     // 收件箱
     EmailTo: [
-        'xx@qq.com',
-        'xx@qq.com'
+        '1172830949@qq.com',
+        '1570680400@qq.com'
     ]
 }

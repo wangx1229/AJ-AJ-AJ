@@ -38,7 +38,7 @@ async function check() {
     lastData = newIds;
     if (diff && diff.length) {
         let infos = diff.map( v => {
-            let info = shoes.find(v => v.id === diff);
+            let info = shoes.find(vv => vv.id === v);
             return info;
         });
         return infos
