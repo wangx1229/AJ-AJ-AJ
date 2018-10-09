@@ -1,0 +1,26 @@
+{
+  "name": "AJ-AJ-AJ",
+  "version": "1.0.0",
+  "description": "For AJ, for limit shoes, for bonus sale\r ### 为了突袭发售！！！\r 1.首先，使用setInterval函数每个1800mm请求一次nike列表页面，读取列表鞋子信息。",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Dongss/AJ-AJ-AJ.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Dongss/AJ-AJ-AJ/issues"
+  },
+  "homepage": "https://github.com/Dongss/AJ-AJ-AJ#readme",
+  "dependencies": {
+    "lodash": "^4.17.11",
+    "nodemailer": "^4.6.8",
+    "request": "^2.88.0"
+  }
+}
