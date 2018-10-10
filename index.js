@@ -15,14 +15,14 @@ async function main() {
         try {
             let info = await check();
             if (info) {
+                console.log(new Date());
                 console.log(info);
-                await sendMail(JSON.stringify(info))
+                await sendMail(info)
             }
-            
-            await sleep(CheckInterval);
         } catch (e) {
             console.log("error:", e);
         }
+        await sleep(CheckInterval);
     }
 }
 
@@ -61,13 +61,24 @@ function get(rurl) {
 
 const transport = Mailer.createTransport(EmailConf);
 
-function sendMail(text) {
+function sendMail(info) {
+    let text = JSON.stringify(info)
     return new Promise((resolve, reject) => {
         transport.sendMail({
                 from: EmailFrom,
                 to: EmailTo,
                 subject: "AJAJAJAJAJ",
-                text: text
+                html: `
+                <html>
+                    <body>
+                        <h1>
+                            AJAJAJAJAJ
+                        </h1>
+                        <h2>这里是html，你自己优化，根据 info 的数据结构</h2>
+                        <p>${text}</p>
+                    </body>
+                </html>
+                `
             },
             function (err) {
                 if (err) {
