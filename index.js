@@ -13,12 +13,7 @@ let lastData = [];
 async function main() {
     while (true) {
         try {
-            let info = await check();
-            if (info) {
-                console.log(new Date());
-                console.log(info);
-                await sendMail(info)
-            }
+            await check()
         } catch (e) {
             console.log("error:", e);
         }
@@ -27,21 +22,20 @@ async function main() {
 }
 
 async function check() {
-    let r = await get(URL);
-    let shoes = r.objects;
+    let r = await get(URL)
+    let shoes = r.objects
     let newIds = shoes.map(v => v.id)
     if (!lastData || !lastData.length) {
         lastData = newIds;
         return;
     }
     let diff = _.difference(newIds, lastData)
-    lastData = newIds;
+    lastData = newIds
     if (diff && diff.length) {
         let infos = diff.map( v => {
-            let info = shoes.find(vv => vv.id === v);
-            return info;
-        });
-        return infos
+            let info = shoes.find(vv => vv.id === v)
+            sendMail(info)
+        })
     }
 }
 
@@ -58,24 +52,19 @@ function get(rurl) {
         });
     });
 }
-
 const transport = Mailer.createTransport(EmailConf);
 
 function sendMail(info) {
-    let text = JSON.stringify(info)
     return new Promise((resolve, reject) => {
         transport.sendMail({
                 from: EmailFrom,
                 to: EmailTo,
-                subject: "AJAJAJAJAJ",
+                subject: "new product",
                 html: `
                 <html>
                     <body>
-                        <h1>
-                            AJAJAJAJAJ
-                        </h1>
-                        <h2>这里是html，你自己优化，根据 info 的数据结构</h2>
-                        <p>${text}</p>
+                        <h1>${info.productInfo[0].productContent.fullTitle}</h1>
+                        <div><img src="${info.publishedContent.properties.coverCard.properties.portraitURL}"  alt="${info.productInfo[0].productContent.fullTitle}"/></div>
                     </body>
                 </html>
                 `
