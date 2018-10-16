@@ -7,7 +7,7 @@ module.exports = {
         secureConnection: true,
         auth: {
             user: '1570680400@qq.com',
-            pass: 'xxxxx'
+            pass: 'hphqbgyzsfknjfef'
         }
     },
     // 发件人
