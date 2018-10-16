@@ -61,9 +61,11 @@ function sendMail(info) {
         let firstType = 'unknown'
         let lastType = '未知'
         if (info.productInfo && info.productInfo.length) {
-            type = info.productInfo[0].launchView.method
+            if (info.productInfo[0].launchView) {
+                firstType = info.productInfo[0].launchView.method
+            }
         }
-        switch (type) {
+        switch (firstType) {
             case 'unknown':
                 lastType = '没有获取到发售方式'
                 break
