@@ -13,12 +13,7 @@ let lastData = [];
 async function main() {
     while (true) {
         try {
-            let info = await check();
-            if (info) {
-                console.log(new Date());
-                console.log(info);
-                await sendMail(info)
-            }
+            await check()
         } catch (e) {
             console.log("error:", e);
         }
@@ -27,21 +22,20 @@ async function main() {
 }
 
 async function check() {
-    let r = await get(URL);
-    let shoes = r.objects;
+    let r = await get(URL)
+    let shoes = r.objects
     let newIds = shoes.map(v => v.id)
     if (!lastData || !lastData.length) {
         lastData = newIds;
         return;
     }
     let diff = _.difference(newIds, lastData)
-    lastData = newIds;
+    lastData = newIds
     if (diff && diff.length) {
         let infos = diff.map( v => {
-            let info = shoes.find(vv => vv.id === v);
-            return info;
-        });
-        return infos
+            let info = shoes.find(vv => vv.id === v)
+            sendMail(info)
+        })
     }
 }
 
@@ -58,24 +52,49 @@ function get(rurl) {
         });
     });
 }
-
 const transport = Mailer.createTransport(EmailConf);
 
 function sendMail(info) {
-    let text = JSON.stringify(info)
     return new Promise((resolve, reject) => {
+        const title = info.publishedContent.properties.title
+        const src = info.publishedContent.properties.portraitURL
+        let firstType = 'unknown'
+        let lastType = '未知'
+        if (info.productInfo && info.productInfo.length) {
+            type = info.productInfo[0].launchView.method
+        }
+        switch (type) {
+            case 'unknown':
+                lastType = '没有获取到发售方式'
+                break
+            case 'FLOW':
+                lastType = '先到先得'
+                break
+            case 'LEO':
+                lastType = '先到先得或者突袭发售'
+                break
+            case 'DAN':
+                lastType = '30分钟抽签发售'
+                break
+            case 'NIKE PASS':
+                lastType = '上海耐克001发售'
+                break
+            case 'AR':
+                lastType = '游戏发售，可能要拍摄制定的图片解锁购买权'
+                break
+            default:
+                lastType = '未知发售方式，可有可能是刮刮乐哦'
+        } 
         transport.sendMail({
                 from: EmailFrom,
                 to: EmailTo,
-                subject: "AJAJAJAJAJ",
+                subject: "new product",
                 html: `
                 <html>
                     <body>
-                        <h1>
-                            AJAJAJAJAJ
-                        </h1>
-                        <h2>这里是html，你自己优化，根据 info 的数据结构</h2>
-                        <p>${text}</p>
+                        <h1>${title}</h1>
+                        <h3>${firstType}: ${lastType}</h3>
+                        <div><img src="${src}"  alt="${title}"/></div>
                     </body>
                 </html>
                 `
