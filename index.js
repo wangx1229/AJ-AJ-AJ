@@ -56,17 +56,12 @@ const transport = Mailer.createTransport(EmailConf);
 
 function sendMail(info) {
     return new Promise((resolve, reject) => {
-        const title = info.publishedContent.properties.title
-        const src = info.publishedContent.properties.portraitURL
-        let firstType = 'unknown'
+        const title = _.get(info, 'publishedContent.properties.coverCard.properties.title', '缺少字段信息')
+        const src = _.get(info, 'publishedContent.properties.coverCard.properties.portraitURL', '缺少字段信息')
+        let firstType = _.get(info, 'productInfo[0].launchView.method', 'lack-of-key')
         let lastType = '未知'
-        if (info.productInfo && info.productInfo.length) {
-            if (info.productInfo[0].launchView) {
-                firstType = info.productInfo[0].launchView.method
-            }
-        }
         switch (firstType) {
-            case 'unknown':
+            case 'lack-of-key':
                 lastType = '没有获取到发售方式'
                 break
             case 'FLOW':
@@ -96,7 +91,7 @@ function sendMail(info) {
                     <body>
                         <h1>${title}</h1>
                         <h3>${firstType}: ${lastType}</h3>
-                        <div><img src="${src}"  alt="${title}"/></div>
+                        <img style="width:100%" src="${src}" alt="${title}"/>
                     </body>
                 </html>
                 `
