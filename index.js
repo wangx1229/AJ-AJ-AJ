@@ -11,6 +11,7 @@ const {CheckInterval, EmailConf, EmailFrom, EmailTo} = config;
 let lastData = [];
 
 async function main() {
+    await check()
     while (true) {
         try {
             await check()
@@ -56,13 +57,19 @@ const transport = Mailer.createTransport(EmailConf);
 
 function sendMail(info) {
     return new Promise((resolve, reject) => {
-        const title = _.get(info, 'publishedContent.properties.coverCard.properties.title', '缺少字段信息')
+        const title = _.get(info, 'publishedContent.properties.seo.title', '缺少字段信息')
         const src = _.get(info, 'publishedContent.properties.coverCard.properties.portraitURL', '缺少字段信息')
-        let firstType = _.get(info, 'productInfo[0].launchView.method', 'lack-of-key')
+        const time = _.get(info, 'productInfo[0].launchView.startEntryDate', null)
+        let formateTime = '发售时间未知'
+        let firstType = _.get(info, 'productInfo[0].launchView.method', '缺少字段信息')
         let lastType = '未知'
+        if (time) {
+            const myDate = new Date(time)
+            formateTime = `${myDate.getMonth() + 1}月${myDate.getDate()}日，${myDate.getHours() < 10 ? '0' + myDate.getHours() : myDate.getHours()}:${myDate.getMinutes() < 10 ? '0' + myDate.getMinutes() : myDate.getMinutes()}`
+        }
         switch (firstType) {
-            case 'lack-of-key':
-                lastType = '没有获取到发售方式'
+            case '缺少字段信息':
+                lastType = '未知发售方式，进入SNKRS查看'
                 break
             case 'FLOW':
                 lastType = '先到先得'
@@ -80,17 +87,16 @@ function sendMail(info) {
                 lastType = '游戏发售，可能要拍摄制定的图片解锁购买权'
                 break
             default:
-                lastType = '未知发售方式，可有可能是刮刮乐哦'
+                lastType = '未知发售方式，有可能是刮刮乐'
         } 
         transport.sendMail({
                 from: EmailFrom,
                 to: EmailTo,
-                subject: "new product",
+                subject: `${title.split(';')[0]}`,
                 html: `
                 <html>
                     <body>
-                        <h1>${title}</h1>
-                        <h3>${firstType}: ${lastType}</h3>
+                        <h3>${firstType}:${lastType}|发售时间：${formateTime}</h3>
                         <img style="width:100%" src="${src}" alt="${title}"/>
                     </body>
                 </html>

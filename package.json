@@ -4,7 +4,7 @@
   "description": "For AJ, for limit shoes, for bonus sale\r ### 为了突袭发售！！！\r 1.首先，使用setInterval函数每个1800mm请求一次nike列表页面，读取列表鞋子信息。",
   "main": "index.js",
   "scripts": {
-    "start": "pm2 start index.js",
+    "start": "node index.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {

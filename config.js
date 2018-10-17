@@ -15,6 +15,6 @@ module.exports = {
     // 收件箱
     EmailTo: [
         '1172830949@qq.com',
-        '1570680400@qq.com'
+        '1570680400@qq.com',
     ]
 }
