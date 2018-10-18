@@ -24,6 +24,13 @@ async function main() {
 async function check() {
     let r = await get()
     let shoes = r.objects
+    // 第一遍执行程序时 设置lastData并不发送任何邮件
+    if (_.isEmpty(lastData)) {
+        shoes.forEach(item => {
+            lastData[item.id] = _.get(item, 'productInfo[0].launchView.startEntryDate', '')
+        })
+        return
+    }
     shoes.forEach(item => {
         const timeStr = _.get(item, 'productInfo[0].launchView.startEntryDate', '')
         if ((lastData[item.id] && lastData[item.id] !== timeStr) || lastData[item.id] === undefined) {
