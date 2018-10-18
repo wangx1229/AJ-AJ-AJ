@@ -4,14 +4,13 @@ const Mailer = require('nodemailer');
 const config = require('./config');
 
 // 请求的地址
-const URL = 'https://api.nike.com/product_feed/threads/v2/?anchor=0&count=5&filter=marketplace%28CN%29&filter=language%28zh-Hans%29&filter=channelId%28010794e5-35fe-4e32-aaff-cd2c74f89d61%29&filter=exclusiveAccess%28true%2Cfalse%29&fields=active&fields=id&fields=lastFetchTime&fields=productInfo&fields=publishedContent.nodes&fields=publishedContent.properties.coverCard&fields=publishedContent.properties.productCard&fields=publishedContent.properties.products&fields=publishedContent.properties.publish.collections&fields=publishedContent.properties.relatedThreads&fields=publishedContent.properties.seo&fields=publishedContent.properties.threadType&fields=publishedContent.properties.custom';
+const url = 'https://api.nike.com/product_feed/threads/v2/?anchor=0&count=10&filter=marketplace%28CN%29&filter=language%28zh-Hans%29&filter=channelId%28010794e5-35fe-4e32-aaff-cd2c74f89d61%29&filter=exclusiveAccess%28true%2Cfalse%29&fields=active&fields=id&fields=lastFetchTime&fields=productInfo&fields=publishedContent.nodes&fields=publishedContent.properties.coverCard&fields=publishedContent.properties.productCard&fields=publishedContent.properties.products&fields=publishedContent.properties.publish.collections&fields=publishedContent.properties.relatedThreads&fields=publishedContent.properties.seo&fields=publishedContent.properties.threadType&fields=publishedContent.properties.custom';
 
 const {CheckInterval, EmailConf, EmailFrom, EmailTo} = config;
 
-let lastData = [];
+let lastData = {}
 
 async function main() {
-    await check()
     while (true) {
         try {
             await check()
@@ -23,27 +22,21 @@ async function main() {
 }
 
 async function check() {
-    let r = await get(URL)
+    let r = await get()
     let shoes = r.objects
-    let newIds = shoes.map(v => v.id)
-    if (!lastData || !lastData.length) {
-        lastData = newIds;
-        return;
-    }
-    let diff = _.difference(newIds, lastData)
-    lastData = newIds
-    if (diff && diff.length) {
-        let infos = diff.map( v => {
-            let info = shoes.find(vv => vv.id === v)
-            sendMail(info)
-        })
-    }
+    shoes.forEach(item => {
+        const timeStr = _.get(item, 'productInfo[0].launchView.startEntryDate', '')
+        if ((lastData[item.id] && lastData[item.id] !== timeStr) || lastData[item.id] === undefined) {
+            lastData[item.id] = timeStr
+            sendMail(item)
+        }
+    })
 }
 
-function get(rurl) {
+function get() {
     return new Promise((resolve, reject) => {
         Request.get({
-            url: rurl,
+            url,
             json: true
         }, function (error, response, body) {
             if (error) {
@@ -58,6 +51,7 @@ const transport = Mailer.createTransport(EmailConf);
 function sendMail(info) {
     return new Promise((resolve, reject) => {
         const title = _.get(info, 'publishedContent.properties.seo.title', '缺少字段信息')
+        const href = _.get(info, 'publishedContent.properties.seo.slug', 'javascript:;')
         const src = _.get(info, 'publishedContent.properties.coverCard.properties.portraitURL', '缺少字段信息')
         const time = _.get(info, 'productInfo[0].launchView.startEntryDate', null)
         let formateTime = '发售时间未知'
@@ -75,7 +69,7 @@ function sendMail(info) {
                 lastType = '先到先得'
                 break
             case 'LEO':
-                lastType = '先到先得或者突袭发售'
+                lastType = '先到先得'
                 break
             case 'DAN':
                 lastType = '30分钟抽签发售'
@@ -96,7 +90,7 @@ function sendMail(info) {
                 html: `
                 <html>
                     <body>
-                        <h3>${firstType}:${lastType}|发售时间：${formateTime}</h3>
+                        <h3>${firstType}:${lastType}|发售时间：${formateTime}。<a href="https://www.nike.com/cn/launch/t/${href}" target="_blank">${href !== 'javascript:;' ? '前往发售页面查看发售详情' : '没有找到发售连接'}</a></h3>
                         <img style="width:100%" src="${src}" alt="${title}"/>
                     </body>
                 </html>
