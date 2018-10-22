@@ -8,7 +8,7 @@ const url = 'https://api.nike.com/product_feed/threads/v2/?anchor=0&count=10&fil
 
 const {CheckInterval, EmailConf, EmailFrom, EmailTo} = config;
 
-let lastData = {}
+let lastData = []
 
 async function main() {
     while (true) {
