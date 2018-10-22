@@ -57,6 +57,7 @@ const transport = Mailer.createTransport(EmailConf);
 function sendMail(info) {
     return new Promise((resolve, reject) => {
         const title = _.get(info, 'publishedContent.properties.seo.title', '缺少字段信息')
+        const price = _.get(info, 'productInfo[0].merchPrice.fullPrice', null)
         const href = _.get(info, 'publishedContent.properties.seo.slug', 'javascript:;')
         const src = _.get(info, 'publishedContent.properties.coverCard.properties.portraitURL', '缺少字段信息')
         const time = _.get(info, 'productInfo[0].launchView.startEntryDate', null)
@@ -96,7 +97,7 @@ function sendMail(info) {
                 html: `
                 <html>
                     <body>
-                        <h3>${firstType}:${lastType}|发售时间：${formateTime}。<a href="https://www.nike.com/cn/launch/t/${href}" target="_blank">${href !== 'javascript:;' ? '前往发售页面查看发售详情' : '没有找到发售连接'}</a></h3>
+                        <h3>${firstType}:${lastType}|发售时间：${formateTime}，发售价格：${price}<a href="https://www.nike.com/cn/launch/t/${href}" target="_blank">${href !== 'javascript:;' ? '前往发售页面查看发售详情' : '没有找到发售连接'}</a></h3>
                         <img style="width:100%" src="${src}" alt="${title}"/>
                     </body>
                 </html>
